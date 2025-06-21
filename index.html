@@ -357,11 +357,14 @@
             });
         });
 
+        // Configuración - URL de Google Apps Script
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcDDXb3IsjZoxgstlkUKcgJAjfuHtBvjhT85Az74Y9BRkVjIfRBQREfsN5Bq5Gr4y6/exec';
+
         // Form submission
         const form = document.getElementById('inspirationForm');
         const successMessage = document.getElementById('successMessage');
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             if (selectedRating === 0) {
@@ -369,30 +372,83 @@
                 return;
             }
 
+            // Deshabilitar botón mientras se envía
+            const submitBtn = form.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Guardando...';
+            submitBtn.disabled = true;
+
             const formData = new FormData(form);
             const entry = {
-                id: Date.now(),
                 url: formData.get('url'),
                 title: formData.get('title'),
                 platform: formData.get('platform'),
-                rating: selectedRating,
+                rating: parseInt(selectedRating),
                 date: new Date().toLocaleDateString('es-ES')
             };
 
-            entries.unshift(entry);
-            updateEntriesList();
-            
-            // Show success message
-            successMessage.classList.add('show');
-            setTimeout(() => {
-                successMessage.classList.remove('show');
-            }, 3000);
-            
-            // Reset form
-            form.reset();
-            selectedRating = 0;
-            ratingEmojis.forEach(e => e.classList.remove('selected'));
-            ratingInput.value = '';
+            try {
+                // Si tienes la URL de Google Apps Script configurada, enviar a Google Sheets
+                if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI') {
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(entry)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        throw new Error(result.message || 'Error al guardar en Google Sheets');
+                    }
+                    
+                    console.log('Datos guardados en Google Sheets:', result);
+                }
+                
+                // También guardar localmente para mostrar en la interfaz
+                entry.id = Date.now();
+                entries.unshift(entry);
+                updateEntriesList();
+                
+                // Show success message
+                successMessage.innerHTML = GOOGLE_SCRIPT_URL !== 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI' 
+                    ? '¡Entrada guardada en Google Sheets exitosamente! 🎉' 
+                    : '¡Entrada guardada localmente! Configura Google Sheets para sincronización 📊';
+                successMessage.classList.add('show');
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                }, 4000);
+                
+                // Reset form
+                form.reset();
+                selectedRating = 0;
+                ratingEmojis.forEach(e => e.classList.remove('selected'));
+                ratingInput.value = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar: ' + error.message + '\nLos datos se guardarán solo localmente.');
+                
+                // Guardar localmente como respaldo
+                entry.id = Date.now();
+                entries.unshift(entry);
+                updateEntriesList();
+                
+                // Show local save message
+                successMessage.innerHTML = '⚠️ Guardado localmente. Revisa la configuración de Google Sheets';
+                successMessage.style.background = 'linear-gradient(45deg, #FF8C00, #FF6347)';
+                successMessage.classList.add('show');
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                    successMessage.style.background = 'linear-gradient(45deg, #228B22, #32CD32)';
+                }, 4000);
+            } finally {
+                // Rehabilitar botón
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
         function updateEntriesList() {
