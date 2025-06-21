@@ -173,6 +173,12 @@
             transform: translateY(0);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .entries-section {
             background: linear-gradient(135deg, #F4A460, #DEB887);
             padding: 40px;
@@ -270,6 +276,37 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .entries-section {
+                padding: 20px;
+            }
+            
+            .rating-emoji {
+                font-size: 2em;
+                padding: 8px;
+            }
+            
+            .entry-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -342,6 +379,9 @@
         let entries = [];
         let selectedRating = 0;
 
+        // Configuración - URL de Google Apps Script
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcDDXb3IsjZoxgstlkUKcgJAjfuHtBvjhT85Az74Y9BRkVjIfRBQREfsN5Bq5Gr4y6/exec';
+
         // Rating system
         const ratingEmojis = document.querySelectorAll('.rating-emoji');
         const ratingInput = document.getElementById('rating');
@@ -356,9 +396,6 @@
                 this.classList.add('selected');
             });
         });
-
-        // Configuración - URL de Google Apps Script
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcDDXb3IsjZoxgstlkUKcgJAjfuHtBvjhT85Az74Y9BRkVjIfRBQREfsN5Bq5Gr4y6/exec';
 
         // Form submission
         const form = document.getElementById('inspirationForm');
@@ -388,24 +425,22 @@
             };
 
             try {
-                // Si tienes la URL de Google Apps Script configurada, enviar a Google Sheets
-                if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI') {
-                    const response = await fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(entry)
-                    });
+                // Enviar a Google Sheets
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(entry)
+                });
 
-                    const result = await response.json();
-                    
-                    if (!result.success) {
-                        throw new Error(result.message || 'Error al guardar en Google Sheets');
-                    }
-                    
-                    console.log('Datos guardados en Google Sheets:', result);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Error al guardar en Google Sheets');
                 }
+                
+                console.log('Datos guardados en Google Sheets:', result);
                 
                 // También guardar localmente para mostrar en la interfaz
                 entry.id = Date.now();
@@ -413,9 +448,7 @@
                 updateEntriesList();
                 
                 // Show success message
-                successMessage.innerHTML = GOOGLE_SCRIPT_URL !== 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI' 
-                    ? '¡Entrada guardada en Google Sheets exitosamente! 🎉' 
-                    : '¡Entrada guardada localmente! Configura Google Sheets para sincronización 📊';
+                successMessage.innerHTML = '¡Entrada guardada en Google Sheets exitosamente! 🎉';
                 successMessage.classList.add('show');
                 setTimeout(() => {
                     successMessage.classList.remove('show');
@@ -487,6 +520,25 @@
 
         // Initialize
         updateEntriesList();
+
+        // Load existing entries from Google Sheets on page load
+        async function loadExistingEntries() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const result = await response.json();
+                
+                if (result.success && result.entries) {
+                    entries = result.entries;
+                    updateEntriesList();
+                    console.log('Entradas cargadas desde Google Sheets:', entries.length);
+                }
+            } catch (error) {
+                console.log('No se pudieron cargar las entradas existentes:', error);
+            }
+        }
+
+        // Load entries when page loads
+        window.addEventListener('load', loadExistingEntries);
     </script>
 </body>
 </html>
