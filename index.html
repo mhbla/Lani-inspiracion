@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Inspiración - Lani Nava</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 25%, #CD853F 50%, #DEB887 75%, #F4A460 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(139, 69, 19, 0.3);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(45deg, #8B4513, #A0522D);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 1.1em;
+        }
+
+        input[type="url"], input[type="text"], select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #DEB887;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #FFF8DC, #FFFACD);
+        }
+
+        input[type="url"]:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #D2691E;
+            box-shadow: 0 0 15px rgba(210, 105, 30, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .rating-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .rating-emoji {
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .rating-emoji:hover {
+            transform: scale(1.2) rotate(10deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .rating-emoji.selected {
+            background: linear-gradient(45deg, #D2691E, #CD853F);
+            transform: scale(1.15);
+            box-shadow: 0 8px 20px rgba(210, 105, 30, 0.4);
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #D2691E, #CD853F);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(210, 105, 30, 0.3);
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(210, 105, 30, 0.4);
+            background: linear-gradient(45deg, #CD853F, #D2691E);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .entries-section {
+            background: linear-gradient(135deg, #F4A460, #DEB887);
+            padding: 40px;
+            border-top: 3px solid #D2691E;
+        }
+
+        .entries-title {
+            color: #8B4513;
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .entry-card {
+            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.2);
+            transition: all 0.3s ease;
+            border-left: 5px solid #D2691E;
+        }
+
+        .entry-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .entry-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .entry-platform {
+            background: linear-gradient(45deg, #CD853F, #D2691E);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .entry-rating {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+
+        .entry-url {
+            display: inline-block;
+            color: #D2691E;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            background: rgba(210, 105, 30, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .entry-url:hover {
+            background: rgba(210, 105, 30, 0.2);
+            transform: scale(1.05);
+        }
+
+        .no-entries {
+            text-align: center;
+            color: #8B4513;
+            font-style: italic;
+            font-size: 1.2em;
+            padding: 40px;
+        }
+
+        .success-message {
+            background: linear-gradient(45deg, #228B22, #32CD32);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .entries-section {
+                padding: 20px;
+            }
+            
+            .rating-emoji {
+                font-size: 2em;
+                padding: 8px;
+            }
+            
+            .entry-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Registro de Inspiración</h1>
+            <p>Para Lani Nava - Captura tus mejores hallazgos</p>
+        </div>
+        
+        <div class="form-section">
+            <div id="successMessage" class="success-message">
+                ¡Entrada guardada exitosamente! 🎉
+            </div>
+            
+            <form id="inspirationForm">
+                <div class="form-group">
+                    <label for="url">🔗 URL del Post:</label>
+                    <input type="url" id="url" name="url" required placeholder="https://ejemplo.com/post">
+                </div>
+                
+                <div class="form-group">
+                    <label for="title">📝 Título o Descripción:</label>
+                    <input type="text" id="title" name="title" required placeholder="Describe brevemente el contenido">
+                </div>
+                
+                <div class="form-group">
+                    <label for="platform">📱 Plataforma:</label>
+                    <select id="platform" name="platform" required>
+                        <option value="">Selecciona una plataforma</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Twitter/X">Twitter/X</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Pinterest">Pinterest</option>
+                        <option value="YouTube">YouTube</option>
+                        <option value="Otra">Otra</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>⭐ Calificación de Inspiración:</label>
+                    <div class="rating-container">
+                        <span class="rating-emoji" data-rating="1">😐</span>
+                        <span class="rating-emoji" data-rating="2">🙂</span>
+                        <span class="rating-emoji" data-rating="3">😊</span>
+                        <span class="rating-emoji" data-rating="4">😍</span>
+                        <span class="rating-emoji" data-rating="5">🤩</span>
+                    </div>
+                    <input type="hidden" id="rating" name="rating" value="">
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="submit-btn">Guardar Inspiración</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="entries-section">
+            <h2 class="entries-title">📚 Entradas Guardadas</h2>
+            <div id="entriesList">
+                <div class="no-entries">
+                    No hay entradas guardadas aún. ¡Comienza a registrar tu inspiración!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let selectedRating = 0;
+
+        // Configuración - URL de Google Apps Script
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcDDXb3IsjZoxgstlkUKcgJAjfuHtBvjhT85Az74Y9BRkVjIfRBQREfsN5Bq5Gr4y6/exec';
+
+        // Rating system
+        const ratingEmojis = document.querySelectorAll('.rating-emoji');
+        const ratingInput = document.getElementById('rating');
+
+        ratingEmojis.forEach(emoji => {
+            emoji.addEventListener('click', function() {
+                selectedRating = this.dataset.rating;
+                ratingInput.value = selectedRating;
+                
+                // Update visual selection
+                ratingEmojis.forEach(e => e.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Form submission
+        const form = document.getElementById('inspirationForm');
+        const successMessage = document.getElementById('successMessage');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (selectedRating === 0) {
+                alert('Por favor selecciona una calificación de inspiración');
+                return;
+            }
+
+            // Deshabilitar botón mientras se envía
+            const submitBtn = form.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Guardando...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            const entry = {
+                url: formData.get('url'),
+                title: formData.get('title'),
+                platform: formData.get('platform'),
+                rating: parseInt(selectedRating),
+                date: new Date().toLocaleDateString('es-ES')
+            };
+
+            try {
+                // Enviar a Google Sheets
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(entry)
+                });
+
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Error al guardar en Google Sheets');
+                }
+                
+                console.log('Datos guardados en Google Sheets:', result);
+                
+                // También guardar localmente para mostrar en la interfaz
+                entry.id = Date.now();
+                entries.unshift(entry);
+                updateEntriesList();
+                
+                // Show success message
+                successMessage.innerHTML = '¡Entrada guardada en Google Sheets exitosamente! 🎉';
+                successMessage.classList.add('show');
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                }, 4000);
+                
+                // Reset form
+                form.reset();
+                selectedRating = 0;
+                ratingEmojis.forEach(e => e.classList.remove('selected'));
+                ratingInput.value = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar: ' + error.message + '\nLos datos se guardarán solo localmente.');
+                
+                // Guardar localmente como respaldo
+                entry.id = Date.now();
+                entries.unshift(entry);
+                updateEntriesList();
+                
+                // Show local save message
+                successMessage.innerHTML = '⚠️ Guardado localmente. Revisa la configuración de Google Sheets';
+                successMessage.style.background = 'linear-gradient(45deg, #FF8C00, #FF6347)';
+                successMessage.classList.add('show');
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                    successMessage.style.background = 'linear-gradient(45deg, #228B22, #32CD32)';
+                }, 4000);
+            } finally {
+                // Rehabilitar botón
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        function updateEntriesList() {
+            const entriesList = document.getElementById('entriesList');
+            
+            if (entries.length === 0) {
+                entriesList.innerHTML = '<div class="no-entries">No hay entradas guardadas aún. ¡Comienza a registrar tu inspiración!</div>';
+                return;
+            }
+
+            const entriesHTML = entries.map(entry => {
+                const ratingEmojis = ['', '😐', '🙂', '😊', '😍', '🤩'];
+                return `
+                    <div class="entry-card">
+                        <div class="entry-header">
+                            <div class="entry-title">${entry.title}</div>
+                            <div class="entry-platform">${entry.platform}</div>
+                        </div>
+                        <div class="entry-rating">
+                            Inspiración: ${ratingEmojis[entry.rating]} (${entry.rating}/5)
+                        </div>
+                        <div>
+                            <strong>Fecha:</strong> ${entry.date}
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <a href="${entry.url}" target="_blank" class="entry-url">
+                                🔗 Ver Post Original
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            entriesList.innerHTML = entriesHTML;
+        }
+
+        // Initialize
+        updateEntriesList();
+
+        // Load existing entries from Google Sheets on page load
+        async function loadExistingEntries() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const result = await response.json();
+                
+                if (result.success && result.entries) {
+                    entries = result.entries;
+                    updateEntriesList();
+                    console.log('Entradas cargadas desde Google Sheets:', entries.length);
+                }
+            } catch (error) {
+                console.log('No se pudieron cargar las entradas existentes:', error);
+            }
+        }
+
+        // Load entries when page loads
+        window.addEventListener('load', loadExistingEntries);
+    </script>
+</body>
+</html>
